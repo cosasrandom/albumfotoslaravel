@@ -1,5 +1,3 @@
-{{-- resources/views/usuario/actualizar.blade.php --}}
-
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -15,18 +13,13 @@
                     {{-- CRÍTICO: Asegúrate de que el action sea profile.update y el método PATCH --}}
                     <form method="POST" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
                         @csrf
-                        @method('patch') {{-- ¡ESTA LÍNEA ES ABSOLUTAMENTE ESENCIAL PARA Breeze! --}}
+                        @method('patch')
 
                         <div>
                             <x-input-label for="name" :value="__('Nombre')" />
-                            {{-- Pre-llenar el campo con el nombre actual del usuario --}}
                             <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)" required autofocus autocomplete="name" />
                             <x-input-error class="mt-2" :messages="$errors->get('name')" />
                         </div>
-
-                        {{-- El campo de Email se ha eliminado según la instrucción del laboratorio --}}
-                        {{-- NO incluyas el campo de email si el laboratorio pide eliminarlo. --}}
-
                         <div>
                             <x-input-label for="password" :value="__('Contraseña Nueva (dejar en blanco para no cambiar)')" />
                             <x-text-input id="password" name="password" type="password" class="mt-1 block w-full" autocomplete="new-password" />
@@ -41,8 +34,6 @@
 
                         <div class="flex items-center gap-4">
                             <x-primary-button>{{ __('Actualizar') }}</x-primary-button>
-
-                            {{-- Mensajes de estado de Breeze (profile-updated) y de tu laboratorio (correcto) --}}
                             @if (session('status') === 'profile-updated')
                                 <p
                                     x-data="{ show: true }"

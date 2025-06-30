@@ -15,7 +15,16 @@
                     </svg>
                     {{ __('Fotos del Álbum: ') }}<span class="font-bold">{{ $album->nombre }}</span>
                 </h2>
-                <p class="mt-1 text-pink-400 italic">Tus recuerdos más preciados</p>
+                <p class="mt-1 text-pink-400 italic">{{ $album->descripcion ?: 'Tus recuerdos más preciados en este álbum' }}</p>
+                <!-- Botón para volver a los álbumes principales -->
+                <div class="mt-4">
+                    <a href="{{ route('album.mostrar') }}" class="inline-flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-full text-sm font-semibold transition-colors duration-200">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        {{ __('Volver a Mis Álbumes') }}
+                    </a>
+                </div>
             </div>
         </div>
     </x-slot>
@@ -24,18 +33,32 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white bg-opacity-70 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden">
                 <div class="p-6 md:p-8">
+                    <!-- Mensajes de sesión -->
+                    @if (session('correcto'))
+                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                            <strong class="font-bold">¡Éxito!</strong>
+                            <span class="block sm:inline">{{ session('correcto') }}</span>
+                        </div>
+                    @endif
+                    @if (session('error'))
+                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                            <strong class="font-bold">¡Error!</strong>
+                            <span class="block sm:inline">{{ session('error') }}</span>
+                        </div>
+                    @endif
+
                     <!-- Botón crear foto -->
                     <div class="flex justify-end mb-8">
-                        <a href="#" class="inline-flex items-center px-5 py-3 bg-gradient-to-r from-pink-500 to-purple-600 border border-transparent rounded-full font-semibold text-sm text-white uppercase tracking-widest hover:from-pink-600 hover:to-purple-700 transition-all duration-300 transform hover:-translate-y-0.5 shadow-lg shadow-pink-200 hover:shadow-xl">
+                        <a href="{{ route('foto.create', $album) }}" class="inline-flex items-center px-5 py-3 bg-gradient-to-r from-pink-500 to-purple-600 border border-transparent rounded-full font-semibold text-sm text-white uppercase tracking-widest hover:from-pink-600 hover:to-purple-700 transition-all duration-300 transform hover:-translate-y-0.5 shadow-lg shadow-pink-200 hover:shadow-xl">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                             </svg>
-                            {{ __('Crear Foto') }}
+                            {{ __('Añadir Nueva Foto') }}
                         </a>
                     </div>
 
                     {{-- Verificar si hay fotos --}}
-                    @if (sizeof($fotos) > 0)
+                    @if ($fotos->count() > 0)
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                             @foreach ($fotos as $foto)
                                 <div class="bg-white border border-pink-100 rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-pink-200">
@@ -50,7 +73,8 @@
                                     
                                     <div class="p-4">
                                         <div class="relative overflow-hidden rounded-lg aspect-square">
-                                            <img src="{{ asset('storage/' . $foto->ruta) }}" alt="{{ $foto->nombre }}" class="w-full h-60 object-cover rounded-lg transition duration-500 hover:scale-105">
+                                            <!-- Asegúrate de que $foto->foto_ruta es la columna correcta para la ruta de la imagen -->
+                                            <img src="{{ asset('storage/' . $foto->foto_ruta) }}" alt="{{ $foto->nombre }}" class="w-full h-60 object-cover rounded-lg transition duration-500 hover:scale-105">
                                             <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                                         </div>
                                         
@@ -59,19 +83,24 @@
                                         </p>
 
                                         <div class="mt-4 flex flex-wrap gap-2">
-                                            <a href="#" class="flex-1 inline-flex items-center justify-center px-3 py-2 bg-gradient-to-r from-lime-400 to-green-500 border border-transparent rounded-full font-semibold text-xs text-white uppercase tracking-widest hover:opacity-90 transition-all">
+                                            <a href="{{ route('foto.edit', $foto) }}" class="flex-1 inline-flex items-center justify-center px-3 py-2 bg-gradient-to-r from-lime-400 to-green-500 border border-transparent rounded-full font-semibold text-xs text-white uppercase tracking-widest hover:opacity-90 transition-all">
                                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                                 </svg>
                                                 {{ __('Editar') }}
-                                            </a>
+                                            </a> 
                                             
-                                            <a href="#" onclick="return confirm('¿Está seguro que desea eliminar esta foto?')" class="flex-1 inline-flex items-center justify-center px-3 py-2 bg-gradient-to-r from-orange-500 to-red-600 border border-transparent rounded-full font-semibold text-xs text-white uppercase tracking-widest hover:opacity-90 transition-all">
-                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                                </svg>
-                                                {{ __('Eliminar') }}
-                                            </a>
+                                            <!-- Botón de Eliminar Foto (puedes implementarlo más adelante) -->
+                                            <form action="{{ route('foto.destroy', $foto) }}" method="POST" onsubmit="return confirm('¿Está seguro que desea eliminar esta foto? Esta acción no se puede deshacer.');" class="flex-1">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="w-full inline-flex items-center justify-center px-3 py-2 bg-gradient-to-r from-orange-500 to-red-600 border border-transparent rounded-full font-semibold text-xs text-white uppercase tracking-widest hover:opacity-90 transition-all">
+                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                    </svg>
+                                                    {{ __('Eliminar') }}
+                                                </button>
+                                            </form> 
                                         </div>
                                     </div>
                                 </div>
@@ -88,11 +117,11 @@
                                 </div>
                                 <h3 class="text-xl font-semibold text-gray-800 mb-2">{{ __('Este álbum está vacío') }}</h3>
                                 <p class="text-gray-600 mb-6">{{ __('Comienza añadiendo tus primeras fotos para crear recuerdos inolvidables') }}</p>
-                                <a href="#" class="inline-flex items-center px-5 py-3 bg-gradient-to-r from-pink-500 to-purple-600 border border-transparent rounded-full font-semibold text-sm text-white uppercase tracking-widest hover:from-pink-600 hover:to-purple-700 transition-all duration-300 shadow-lg shadow-pink-200 hover:shadow-xl">
+                                <a href="{{ route('foto.create', $album) }}" class="inline-flex items-center px-5 py-3 bg-gradient-to-r from-pink-500 to-purple-600 border border-transparent rounded-full font-semibold text-sm text-white uppercase tracking-widest hover:from-pink-600 hover:to-purple-700 transition-all duration-300 shadow-lg shadow-pink-200 hover:shadow-xl">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                     </svg>
-                                    {{ __('Crear Foto') }}
+                                    {{ __('Añadir Nueva Foto') }}
                                 </a>
                             </div>
                         </div>

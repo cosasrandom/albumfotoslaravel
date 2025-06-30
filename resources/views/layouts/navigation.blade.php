@@ -13,7 +13,7 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
 
-                    <x-nav-link :href="url('/album')" :active="request()->is('album*')">
+                    <x-nav-link :href="url('/albumes')" :active="request()->is('album*')">
                         {{ __('Mis Álbumes') }}
                     </x-nav-link>
                     </div>
